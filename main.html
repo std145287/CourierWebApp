@@ -52,18 +52,10 @@
 
 <script>
   //  ***************** Location ***************************
-  // San Francisco
-  // var map = L.map('map').setView([37.75, -122.23], 10);
-  // London
-  // var map = L.map('map').setView([51.505, -0.09], 13);
-  // Thessaloniki
+
   var map = L.map('map').setView([40.63, 22.94], 12);
 
   //  ***************** Type of map ***************************
-  // var tiles = L.esri.basemapLayer("Streets").addTo(map);
-
-  //  L.esri.basemapLayer('Topographic').addTo(map);
-
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
@@ -73,48 +65,7 @@
   var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
 
   // 2.a Searching
-  // L.esri.Geocoding.geosearch({
-  //   providers: [
-  //     arcgisOnline,
-  //     L.esri.Geocoding.mapServiceProvider({
-  //       label: 'States and Counties',
-  //       url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
-  //       layers: [2, 3],
-  //       searchFields: ['NAME', 'STATE_NAME']
-  //     })
-  //   ]
-  // }).addTo(map);
-
-  // 2.b Searching
-  // L.esri.Geocoding.geosearch({
-  //   providers: [
-  //     arcgisOnline,
-  //     L.esri.Geocoding.featureLayerProvider({
-  //       url: 'https://services.arcgis.com/uCXeTVveQzP4IIcx/arcgis/rest/services/gisday/FeatureServer/0/',
-  //       searchFields: ['Name', 'Organization'],
-  //       label: 'GIS Day Events',
-  //       bufferRadius: 5000,
-  //       showMarker: true,
-  //       formatSuggestion: function (feature) {
-  //         return feature.properties.Name + ' - ' + feature.properties.Organization;
-  //       },
-  //       marker: {
-  //         // optional: L.Marker    - default L.Icon.Default
-  //         icon: new L.Icon.Default(),
-  //         draggable: false,
-  //       },
-  //     })
-  //   ]
-  // }).addTo(map);
-
-  // 2.ψ Searching
   var searchControl = L.esri.Geocoding.geosearch().addTo(map);
-
-  // var markerIcon = L.Icon.extend({
-  //   options: {
-  //     popupAnchor: [-3,-3]
-  //   }
-  // })
 
   var results = L.layerGroup().addTo(map);
 
