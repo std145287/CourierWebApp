@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Esri Leaflet Quickstart</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+  <!-- Load Leaflet from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+  <!-- Load react-leaflet-editable-popup -->
+  <link rel="stylesheet" href="popup_mod/leaflet-popup-modifier.css"/>
+  <script src="popup_mod/leaflet-popup-modifier.js"></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js"
+    integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ=="
+    crossorigin=""></script>
+
+  <!-- Leaflet GeoSearch -->
+  <!-- <link rel="stylesheet"
+    href="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.css"/>
+  <script src="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.umd.js"></script> -->
+
+  <!-- Load Esri Leaflet Geocoder from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css"
+    integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
+    crossorigin="">
+  <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js"
+    integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA=="
+    crossorigin="">
+  </script>
+
+  <!-- Load Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+  //  ***************** Location ***************************
+  // San Francisco
+  // var map = L.map('map').setView([37.75, -122.23], 10);
+  // London
+  // var map = L.map('map').setView([51.505, -0.09], 13);
+  // Thessaloniki
+  var map = L.map('map').setView([40.63, 22.94], 12);
+
+  //  ***************** Type of map ***************************
+  // var tiles = L.esri.basemapLayer("Streets").addTo(map);
+
+  //  L.esri.basemapLayer('Topographic').addTo(map);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // ******************** Searching ***************************
+  // 1. Define Provider
+  var arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider();
+
+  // 2.a Searching
+  // L.esri.Geocoding.geosearch({
+  //   providers: [
+  //     arcgisOnline,
+  //     L.esri.Geocoding.mapServiceProvider({
+  //       label: 'States and Counties',
+  //       url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer',
+  //       layers: [2, 3],
+  //       searchFields: ['NAME', 'STATE_NAME']
+  //     })
+  //   ]
+  // }).addTo(map);
+
+  // 2.b Searching
+  // L.esri.Geocoding.geosearch({
+  //   providers: [
+  //     arcgisOnline,
+  //     L.esri.Geocoding.featureLayerProvider({
+  //       url: 'https://services.arcgis.com/uCXeTVveQzP4IIcx/arcgis/rest/services/gisday/FeatureServer/0/',
+  //       searchFields: ['Name', 'Organization'],
+  //       label: 'GIS Day Events',
+  //       bufferRadius: 5000,
+  //       showMarker: true,
+  //       formatSuggestion: function (feature) {
+  //         return feature.properties.Name + ' - ' + feature.properties.Organization;
+  //       },
+  //       marker: {
+  //         // optional: L.Marker    - default L.Icon.Default
+  //         icon: new L.Icon.Default(),
+  //         draggable: false,
+  //       },
+  //     })
+  //   ]
+  // }).addTo(map);
+
+  // 2.ψ Searching
+  var searchControl = L.esri.Geocoding.geosearch().addTo(map);
+
+  // var markerIcon = L.Icon.extend({
+  //   options: {
+  //     popupAnchor: [-3,-3]
+  //   }
+  // })
+
+  var results = L.layerGroup().addTo(map);
+
+  searchControl.on('results', function (data) {
+    results.clearLayers();
+    for (var i = data.results.length - 1; i >= 0; i--) {
+      results.addLayer(L.marker(data.results[i].latlng/*, {icon:markerIcon}*/));
+    }
+  });
+  
+// ******************** Χειροκίνητη τοποθέτηση πινέζα με Reverse **********************
+var geocodeService = L.esri.Geocoding.geocodeService();
+
+map.on('click', function(e) {
+     geocodeService.reverse().latlng(e.latlng).run(function(error, result) {
+         L.marker(result.latlng).addTo(map).bindPopup(result.address.Match_addr, {
+           removable: true, 
+           editable: true,
+           clickable: true
+          }).openPopup();
+     });
+});
+
+
+</script>
+
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyClBzXTEEMxIuln20NWAjCaMyXFHmzZhfk",
+    authDomain: "mapofthessaloniki.firebaseapp.com",
+    databaseURL: "https://mapofthessaloniki.firebaseio.com",
+    projectId: "mapofthessaloniki",
+    storageBucket: "mapofthessaloniki.appspot.com",
+    messagingSenderId: "847763585938",
+    appId: "1:847763585938:web:76a0d3f626776818725f4b"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+</body>
+</html>
